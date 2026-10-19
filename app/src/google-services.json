@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "421796813961",
+    "firebase_url": "https://lista-de-la-compra-2d920-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "lista-de-la-compra-2d920",
+    "storage_bucket": "lista-de-la-compra-2d920.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421796813961:android:71c5b7552132ff82513a58",
+        "android_client_info": {
+          "package_name": "org.insbaixcamp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "421796813961-nilbrha5vk1rt398nmodhbmdqoj6jfh9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.insbaixcamp",
+            "certificate_hash": "ed6ffe0bde7f0110731bcafd2a5af146d4a9126f"
+          }
+        },
+        {
+          "client_id": "421796813961-t77ehmsgs70nkt8o920vjj43n9138npn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.insbaixcamp",
+            "certificate_hash": "d59411a21d29b1c6fb91ba4932b23e1316be3f12"
+          }
+        },
+        {
+          "client_id": "421796813961-t35phbajlve099uedg0tfm633t54o651.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCn71NXYN5UQiZqu8iyE4OS62Og32gp9lw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421796813961-t35phbajlve099uedg0tfm633t54o651.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
