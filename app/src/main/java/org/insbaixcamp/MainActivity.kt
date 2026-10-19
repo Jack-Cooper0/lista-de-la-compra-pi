@@ -1,6 +1,8 @@
 package org.insbaixcamp
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,8 +38,14 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
+import com.google.firebase.database.getValue
 import kotlinx.coroutines.launch
 import org.insbaixcamp.ui.theme.ListaDeLaCompraTheme
 
@@ -45,8 +53,25 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val database = Firebase.database
+        val myRef = database.getReference("message")
+
+        myRef.setValue("Hello, World!")
         setContent {
             ListaDeLaCompraTheme {
+                myRef.addValueEventListener(object: ValueEventListener {
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+
+                        val value = snapshot.getValue<String>()
+                        Log.d(TAG, "Value is: " + value)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.w(TAG, "Failed to read value.", error.toException())
+                    }
+
+                })
                 ListaDeLaCompraApp()
             }
         }
