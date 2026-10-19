@@ -107,7 +107,7 @@ fun ListaDeLaCompraApp() {
                     .padding(innerPadding)
             ) {
                 when (currentDestination) {
-                    AppDestinations.HOME -> Greeting("Home")
+                    AppDestinations.HOME -> ListasScreen()
                     AppDestinations.FAVORITES -> Greeting("Favorites")
                     AppDestinations.PROFILE -> ProfileScreen()
                 }
