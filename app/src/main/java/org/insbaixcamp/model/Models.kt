@@ -28,6 +28,7 @@ data class ListaCompra(
     var propietarioEmail: String = "",
     var esCompartida: Boolean = false,
     var usuariosConAcceso: List<String> = emptyList(),
+    var members: Map<String, Boolean> = emptyMap(),
     var categorias: List<Categoria> = emptyList(),
     var productos: List<Producto> = emptyList()
 )

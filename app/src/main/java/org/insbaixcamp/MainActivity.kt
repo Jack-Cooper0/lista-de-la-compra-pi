@@ -1,6 +1,5 @@
 package org.insbaixcamp
 
-import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -53,25 +52,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val database = Firebase.database
-        val myRef = database.getReference("message")
-
-        myRef.setValue("Hello, World!")
         setContent {
             ListaDeLaCompraTheme {
-                myRef.addValueEventListener(object: ValueEventListener {
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-
-                        val value = snapshot.getValue<String>()
-                        Log.d(TAG, "Value is: " + value)
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.w(TAG, "Failed to read value.", error.toException())
-                    }
-
-                })
                 ListaDeLaCompraApp()
             }
         }

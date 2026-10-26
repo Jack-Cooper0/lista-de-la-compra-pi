@@ -180,122 +180,123 @@ fun ListasScreen(
 
         if (listaActual == null) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
                 Button(onClick = { mostrarDialogoNuevaLista = true }) {
                     Text("Crear la teva primera llista de la compra")
                 }
             }
-            return
-        }
-
-        // --- SECTOR CATEGORIES ---
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Categories",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            IconButton(onClick = { mostrarDialogoNuevaCategoria = true }) {
-                Text("+", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-            }
-        }
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            item {
-                FilterChip(
-                    selected = categoriaFiltroId == "",
-                    onClick = { categoriaFiltroId = "" },
-                    label = { Text("Totes") }
-                )
-            }
-            items(listaActual.categorias) { cat ->
-                FilterChip(
-                    selected = categoriaFiltroId == cat.id,
-                    onClick = { categoriaFiltroId = cat.id },
-                    label = { Text(cat.nombre) },
-                    trailingIcon = {
-                        Text(
-                            text = "✎",
-                            modifier = Modifier
-                                .clickable { categoriaAEditar = cat }
-                                .padding(horizontal = 4.dp),
-                            fontSize = 12.sp
-                        )
-                    }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // --- SECTOR PRODUCTES ---
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Productes",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Button(
-                onClick = { mostrarDialogoNuevoProducto = true }
-            ) {
-                Text("+ Nou Producte")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val productosFiltrados = if (categoriaFiltroId.isBlank()) {
-            listaActual.productos
         } else {
-            listaActual.productos.filter { it.categoriaId == categoriaFiltroId }
-        }
-
-        if (productosFiltrados.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
+            // --- SECTOR CATEGORIES ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "No hi ha cap producte en aquesta llista o categoria.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "Categories",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
                 )
+                IconButton(onClick = { mostrarDialogoNuevaCategoria = true }) {
+                    Text("+", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                }
             }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.weight(1f)
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                items(productosFiltrados) { prod ->
-                    val categoria = listaActual.categorias.find { it.id == prod.categoriaId }
-                    ItemProducto(
-                        producto = prod,
-                        nombreCategoria = categoria?.nombre ?: "Sense categoria",
-                        onToggleCompletado = {
-                            viewModel.toggleProductoCompletado(listaActual.id, prod.id)
-                        },
-                        onEditar = {
-                            productoAEditar = prod
-                        },
-                        onEliminar = {
-                            viewModel.eliminarProducto(listaActual.id, prod.id)
+                item {
+                    FilterChip(
+                        selected = categoriaFiltroId == "",
+                        onClick = { categoriaFiltroId = "" },
+                        label = { Text("Totes") }
+                    )
+                }
+                items(listaActual.categorias) { cat ->
+                    FilterChip(
+                        selected = categoriaFiltroId == cat.id,
+                        onClick = { categoriaFiltroId = cat.id },
+                        label = { Text(cat.nombre) },
+                        trailingIcon = {
+                            Text(
+                                text = "✎",
+                                modifier = Modifier
+                                    .clickable { categoriaAEditar = cat }
+                                    .padding(horizontal = 4.dp),
+                                fontSize = 12.sp
+                            )
                         }
                     )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- SECTOR PRODUCTES ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Productes",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Button(
+                    onClick = { mostrarDialogoNuevoProducto = true }
+                ) {
+                    Text("+ Nou Producte")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val productosFiltrados = if (categoriaFiltroId.isBlank()) {
+                listaActual.productos
+            } else {
+                listaActual.productos.filter { it.categoriaId == categoriaFiltroId }
+            }
+
+            if (productosFiltrados.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No hi ha cap producte en aquesta llista o categoria.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(productosFiltrados) { prod ->
+                        val categoria = listaActual.categorias.find { it.id == prod.categoriaId }
+                        ItemProducto(
+                            producto = prod,
+                            nombreCategoria = categoria?.nombre ?: "Sense categoria",
+                            onToggleCompletado = {
+                                viewModel.toggleProductoCompletado(listaActual.id, prod.id)
+                            },
+                            onEditar = {
+                                productoAEditar = prod
+                            },
+                            onEliminar = {
+                                viewModel.eliminarProducto(listaActual.id, prod.id)
+                            }
+                        )
+                    }
                 }
             }
         }

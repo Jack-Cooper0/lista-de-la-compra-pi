@@ -2,6 +2,7 @@ package org.insbaixcamp.repository
 
 import android.util.Log
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -21,43 +22,112 @@ import java.util.UUID
  */
 class ListasRepository {
 
-    private val dbRef = Firebase.database.getReference("listas_compra")
+    private val databaseUrl = "https://lista-de-la-compra-2d920-default-rtdb.europe-west1.firebasedatabase.app"
+    private val dbRef = Firebase.database(databaseUrl).getReference("lists")
 
     private val _listas = MutableStateFlow<List<ListaCompra>>(emptyList())
     val listas: StateFlow<List<ListaCompra>> = _listas.asStateFlow()
 
-    init {
-        // Cargar datos de muestra por defecto si no hay nada en local
-        _listas.value = obtenerListasMuestra()
+    private var valueEventListener: ValueEventListener? = null
 
-        // Sincronización en tiempo real con Firebase Realtime Database
+    init {
+        _listas.value = emptyList()
+
+        try {
+            Firebase.database(databaseUrl).setPersistenceEnabled(true)
+        } catch (_: Exception) {}
+
+        dbRef.keepSynced(true)
+
+        // Sincronizar escucha con el estado de autenticación de Firebase
+        FirebaseAuth.getInstance().addAuthStateListener { auth ->
+            if (auth.currentUser != null) {
+                iniciarEscuchaFirebase()
+            } else {
+                iniciarEscuchaFirebase()
+            }
+        }
+
+        // Iniciar la escucha inicial
         iniciarEscuchaFirebase()
     }
 
     private fun iniciarEscuchaFirebase() {
-        dbRef.addValueEventListener(object : ValueEventListener {
+        detenerEscuchaFirebase()
+
+        val user = FirebaseAuth.getInstance().currentUser
+        val currentUid = user?.uid ?: ""
+
+        val query = if (currentUid.isNotEmpty()) {
+            dbRef.orderByChild("members/$currentUid").equalTo(true)
+        } else {
+            dbRef
+        }
+
+        valueEventListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val listasFirebase = mutableListOf<ListaCompra>()
+                val currentEmail = user?.email ?: ""
+
                 for (child in snapshot.children) {
                     val lista = child.getValue(ListaCompra::class.java)
                     if (lista != null) {
-                        listasFirebase.add(lista)
+                        val esMiembro = currentUid.isNotEmpty() && lista.members.containsKey(currentUid)
+                        val esPropietario = currentEmail.isNotEmpty() && (lista.propietarioEmail == currentEmail || lista.usuariosConAcceso.contains(currentEmail))
+                        val esSinDueno = lista.members.isEmpty() || lista.propietarioEmail.isBlank()
+
+                        if (esMiembro || esPropietario || esSinDueno) {
+                            listasFirebase.add(lista)
+                        }
                     }
                 }
-                if (listasFirebase.isNotEmpty()) {
-                    _listas.value = listasFirebase
-                }
+                _listas.value = listasFirebase
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.w("ListasRepository", "Error al llegir de Firebase Database", error.toException())
+                Log.e("ListasRepository", "Error al leer de Firebase Database: ${error.message}", error.toException())
             }
-        })
+        }
+
+        query.addValueEventListener(valueEventListener!!)
+    }
+
+    private fun detenerEscuchaFirebase() {
+        valueEventListener?.let {
+            dbRef.removeEventListener(it)
+            valueEventListener = null
+        }
     }
 
     private fun guardarEnFirebase(lista: ListaCompra) {
         try {
-            dbRef.child(lista.id).setValue(lista)
+            val user = FirebaseAuth.getInstance().currentUser
+            val currentUid = user?.uid
+            val currentEmail = user?.email
+
+            var listaParaGuardar = lista
+
+            if (currentUid != null && !listaParaGuardar.members.containsKey(currentUid)) {
+                val nuevosMembers = listaParaGuardar.members.toMutableMap()
+                nuevosMembers[currentUid] = true
+                listaParaGuardar = listaParaGuardar.copy(members = nuevosMembers)
+            }
+
+            if (currentEmail != null && (listaParaGuardar.propietarioEmail.isBlank() || listaParaGuardar.propietarioEmail == "alumne@insbaixcamp.cat")) {
+                val nuevosUsuarios = (listaParaGuardar.usuariosConAcceso + currentEmail).distinct()
+                listaParaGuardar = listaParaGuardar.copy(
+                    propietarioEmail = currentEmail,
+                    usuariosConAcceso = nuevosUsuarios
+                )
+            }
+
+            dbRef.child(listaParaGuardar.id).setValue(listaParaGuardar) { error, _ ->
+                if (error != null) {
+                    Log.e("ListasRepository", "Error al guardar en Firebase: ${error.message}")
+                } else {
+                    Log.d("ListasRepository", "Lista guardada con éxito en Firebase: ${listaParaGuardar.nombre}")
+                }
+            }
         } catch (e: Exception) {
             Log.e("ListasRepository", "No s'ha pogut desar a Firebase", e)
         }
@@ -81,12 +151,19 @@ class ListasRepository {
     // --- GESTIÓ DE LLISTES ---
 
     fun crearLista(nombre: String, propietarioEmail: String): ListaCompra {
+        val user = FirebaseAuth.getInstance().currentUser
+        val currentUid = user?.uid ?: ""
+        val emailFinal = user?.email?.takeIf { it.isNotBlank() } ?: propietarioEmail
+
+        val membersMap = if (currentUid.isNotEmpty()) mapOf(currentUid to true) else emptyMap()
+
         val nuevaLista = ListaCompra(
             id = UUID.randomUUID().toString(),
             nombre = nombre,
-            propietarioEmail = propietarioEmail,
+            propietarioEmail = emailFinal,
             esCompartida = false,
-            usuariosConAcceso = listOf(propietarioEmail),
+            usuariosConAcceso = listOf(emailFinal),
+            members = membersMap,
             categorias = listOf(
                 Categoria(id = UUID.randomUUID().toString(), nombre = "General")
             ),
@@ -150,7 +227,6 @@ class ListasRepository {
     fun eliminarCategoria(listaId: String, categoriaId: String) {
         val lista = _listas.value.find { it.id == listaId } ?: return
 
-        // Eliminar categoria y mover sus productos a la primera categoria disponible o dejarlos sin categoria
         val categoriasActualizadas = lista.categorias.filterNot { it.id == categoriaId }
         val fallbackCategoriaId = categoriasActualizadas.firstOrNull()?.id ?: ""
 
@@ -217,44 +293,5 @@ class ListasRepository {
         val productosActualizados = lista.productos.filterNot { it.id == productoId }
         val listaActualizada = lista.copy(productos = productosActualizados)
         actualizarLista(listaActualizada)
-    }
-
-    // --- DADES DE MOSTRA INICIALS ---
-
-    private fun obtenerListasMuestra(): List<ListaCompra> {
-        val catLlactics = Categoria(id = "cat_1", nombre = "Llàctics i Ou")
-        val catFruita = Categoria(id = "cat_2", nombre = "Fruites i Verdures")
-        val catBegudes = Categoria(id = "cat_3", nombre = "Begudes")
-
-        val prod1 = Producto(id = "p1", nombre = "Llet de civada", completado = false, categoriaId = catLlactics.id, cantidad = "2L")
-        val prod2 = Producto(id = "p2", nombre = "Formatge fresc", completado = true, categoriaId = catLlactics.id, cantidad = "200g")
-        val prod3 = Producto(id = "p3", nombre = "Pomes vermelles", completado = false, categoriaId = catFruita.id, cantidad = "1 kg")
-        val prod4 = Producto(id = "p4", nombre = "Aigua mineral", completado = false, categoriaId = catBegudes.id, cantidad = "1 pack")
-
-        val listaPersonal = ListaCompra(
-            id = "lista_1",
-            nombre = "Compra setmanal casa",
-            propietarioEmail = "alumne@insbaixcamp.cat",
-            esCompartida = false,
-            usuariosConAcceso = listOf("alumne@insbaixcamp.cat"),
-            categorias = listOf(catLlactics, catFruita, catBegudes),
-            productos = listOf(prod1, prod2, prod3, prod4)
-        )
-
-        val catFesta = Categoria(id = "cat_4", nombre = "Aperitius")
-        val prodFesta1 = Producto(id = "p5", nombre = "Patates fregides", completado = false, categoriaId = catFesta.id, cantidad = "2 bosses")
-        val prodFesta2 = Producto(id = "p6", nombre = "Refrescos", completado = true, categoriaId = catBegudes.id, cantidad = "6 llaunes")
-
-        val listaCompartida = ListaCompra(
-            id = "lista_2",
-            nombre = "Festa del Projecte (Compartida)",
-            propietarioEmail = "profe@insbaixcamp.cat",
-            esCompartida = true,
-            usuariosConAcceso = listOf("profe@insbaixcamp.cat", "alumne@insbaixcamp.cat"),
-            categorias = listOf(catFesta, catBegudes),
-            productos = listOf(prodFesta1, prodFesta2)
-        )
-
-        return listOf(listaPersonal, listaCompartida)
     }
 }
