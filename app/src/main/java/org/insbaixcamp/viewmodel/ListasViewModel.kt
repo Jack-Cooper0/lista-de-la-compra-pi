@@ -1,6 +1,7 @@
 package org.insbaixcamp.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +14,10 @@ import org.insbaixcamp.repository.ListasRepository
  * S'encarrega de coordinar l'estat de la UI amb el repositori.
  */
 class ListasViewModel(
-    val repository: ListasRepository = ListasRepository()
-) : ViewModel() {
+    application: Application
+) : AndroidViewModel(application) {
+
+    val repository: ListasRepository = ListasRepository(application.applicationContext)
 
     val listas: StateFlow<List<ListaCompra>> = repository.listas
 
