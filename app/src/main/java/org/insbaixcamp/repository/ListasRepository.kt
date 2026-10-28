@@ -205,36 +205,38 @@ class ListasRepository(context: Context) {
     private fun iniciarEscuchaFirebase() {
         detenerEscuchaFirebase()
 
-        val user = FirebaseAuth.getInstance().currentUser
-        val currentUid = user?.uid ?: ""
-
-        val query = if (currentUid.isNotEmpty()) {
-            dbRef.orderByChild("members/$currentUid").equalTo(true)
-        } else {
-            dbRef
-        }
-
         valueEventListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                val user = FirebaseAuth.getInstance().currentUser
+                val currentUid = user?.uid ?: ""
+                val currentEmail = user?.email?.trim()?.lowercase() ?: ""
+
                 val listasFirebase = mutableListOf<ListaCompra>()
-                val currentEmail = user?.email ?: ""
 
                 for (child in snapshot.children) {
                     val lista = child.getValue(ListaCompra::class.java)
                     if (lista != null) {
-                        val esMiembro = currentUid.isNotEmpty() && lista.members.containsKey(currentUid)
-                        val esPropietario = currentEmail.isNotEmpty() && (lista.propietarioEmail == currentEmail || lista.usuariosConAcceso.contains(currentEmail))
-                        val esSinDueno = lista.members.isEmpty() || lista.propietarioEmail.isBlank()
+                        val propEmailLimpio = lista.propietarioEmail.trim().lowercase()
+                        val usuariosAccesoLimpios = lista.usuariosConAcceso.map { it.trim().lowercase() }
 
-                        if (esMiembro || esPropietario || esSinDueno) {
+                        val esMiembroUid = currentUid.isNotEmpty() && lista.members.containsKey(currentUid)
+                        val esPropietarioOCompartida = currentEmail.isNotEmpty() && (
+                            propEmailLimpio == currentEmail ||
+                            usuariosAccesoLimpios.contains(currentEmail)
+                        )
+                        val esSinDueno = lista.members.isEmpty() || propEmailLimpio.isBlank()
+
+                        if (esMiembroUid || esPropietarioOCompartida || esSinDueno) {
                             listasFirebase.add(lista)
+
+                            if (currentUid.isNotEmpty() && !lista.members.containsKey(currentUid)) {
+                                dbRef.child(lista.id).child("members").child(currentUid).setValue(true)
+                            }
                         }
                     }
                 }
-                if (listasFirebase.isNotEmpty()) {
-                    _listas.value = listasFirebase
-                    guardarEnLocal(listasFirebase)
-                }
+                _listas.value = listasFirebase
+                guardarEnLocal(listasFirebase)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -242,7 +244,7 @@ class ListasRepository(context: Context) {
             }
         }
 
-        query.addValueEventListener(valueEventListener!!)
+        dbRef.addValueEventListener(valueEventListener!!)
     }
 
     private fun detenerEscuchaFirebase() {
@@ -256,7 +258,7 @@ class ListasRepository(context: Context) {
         try {
             val user = FirebaseAuth.getInstance().currentUser
             val currentUid = user?.uid
-            val currentEmail = user?.email
+            val currentEmail = user?.email?.trim()?.lowercase()
 
             var listaParaGuardar = lista
 
@@ -266,12 +268,15 @@ class ListasRepository(context: Context) {
                 listaParaGuardar = listaParaGuardar.copy(members = nuevosMembers)
             }
 
-            if (currentEmail != null && (listaParaGuardar.propietarioEmail.isBlank() || listaParaGuardar.propietarioEmail == "alumne@insbaixcamp.cat")) {
-                val nuevosUsuarios = (listaParaGuardar.usuariosConAcceso + currentEmail).distinct()
-                listaParaGuardar = listaParaGuardar.copy(
-                    propietarioEmail = currentEmail,
-                    usuariosConAcceso = nuevosUsuarios
-                )
+            if (!currentEmail.isNullOrBlank()) {
+                if (listaParaGuardar.propietarioEmail.isBlank() || listaParaGuardar.propietarioEmail == "alumne@insbaixcamp.cat") {
+                    listaParaGuardar = listaParaGuardar.copy(propietarioEmail = currentEmail)
+                }
+                val usuariosLimpios = listaParaGuardar.usuariosConAcceso.map { it.trim().lowercase() }
+                if (!usuariosLimpios.contains(currentEmail)) {
+                    val nuevosUsuarios = (usuariosLimpios + currentEmail).distinct()
+                    listaParaGuardar = listaParaGuardar.copy(usuariosConAcceso = nuevosUsuarios)
+                }
             }
 
             dbRef.child(listaParaGuardar.id).setValue(listaParaGuardar) { error, _ ->
@@ -307,7 +312,8 @@ class ListasRepository(context: Context) {
     fun crearLista(nombre: String, propietarioEmail: String): ListaCompra {
         val user = FirebaseAuth.getInstance().currentUser
         val currentUid = user?.uid ?: ""
-        val emailFinal = user?.email?.takeIf { it.isNotBlank() } ?: propietarioEmail
+        val emailFinal = user?.email?.trim()?.lowercase()?.takeIf { it.isNotBlank() }
+            ?: propietarioEmail.trim().lowercase()
 
         val membersMap = if (currentUid.isNotEmpty()) mapOf(currentUid to true) else emptyMap()
 
@@ -316,7 +322,7 @@ class ListasRepository(context: Context) {
             nombre = nombre,
             propietarioEmail = emailFinal,
             esCompartida = false,
-            usuariosConAcceso = listOf(emailFinal),
+            usuariosConAcceso = if (emailFinal.isNotBlank()) listOf(emailFinal) else emptyList(),
             members = membersMap,
             categorias = listOf(
                 Categoria(id = UUID.randomUUID().toString(), nombre = "General")
@@ -337,9 +343,11 @@ class ListasRepository(context: Context) {
 
     fun compartirLista(listaId: String, emailNuevoUsuario: String) {
         val lista = _listas.value.find { it.id == listaId } ?: return
-        if (emailNuevoUsuario.isBlank()) return
+        val emailLimpio = emailNuevoUsuario.trim().lowercase()
+        if (emailLimpio.isBlank()) return
 
-        val nuevosUsuarios = (lista.usuariosConAcceso + emailNuevoUsuario).distinct()
+        val usuariosActualesLimpios = lista.usuariosConAcceso.map { it.trim().lowercase() }
+        val nuevosUsuarios = (usuariosActualesLimpios + emailLimpio).distinct()
         val listaActualizada = lista.copy(
             esCompartida = true,
             usuariosConAcceso = nuevosUsuarios

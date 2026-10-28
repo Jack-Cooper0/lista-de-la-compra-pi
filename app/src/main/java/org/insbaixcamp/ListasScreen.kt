@@ -1,5 +1,6 @@
 package org.insbaixcamp
 
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -117,8 +119,13 @@ fun ListasScreen(
                         onDismissRequest = { dropdownExpandido = false },
                         shape = RoundedCornerShape(20.dp)
                     ) {
-                        val misListas = listas.filter { it.propietarioEmail == emailUsuario || it.propietarioEmail.isBlank() }
-                        val listasCompartidas = listas.filter { it.propietarioEmail != emailUsuario && it.propietarioEmail.isNotBlank() }
+                        val emailLimpio = emailUsuario.trim().lowercase()
+                        val misListas = listas.filter {
+                            it.propietarioEmail.trim().lowercase() == emailLimpio || it.propietarioEmail.isBlank()
+                        }
+                        val listasCompartidas = listas.filter {
+                            it.propietarioEmail.trim().lowercase() != emailLimpio && it.propietarioEmail.isNotBlank()
+                        }
 
                         if (misListas.isNotEmpty()) {
                             DropdownMenuItem(
@@ -441,6 +448,7 @@ fun ListasScreen(
     }
 
     if (mostrarDialogoCompartir && listaActual != null) {
+        val context = LocalContext.current
         DialogoTextoInput(
             titulo = "Compartir Llista",
             etiqueta = "Email de l'usuari",
@@ -448,6 +456,7 @@ fun ListasScreen(
             onDismiss = { mostrarDialogoCompartir = false },
             onConfirmar = { email ->
                 viewModel.compartirLista(listaActual.id, email)
+                Toast.makeText(context, "Llista compartida amb $email", Toast.LENGTH_SHORT).show()
                 mostrarDialogoCompartir = false
             }
         )
