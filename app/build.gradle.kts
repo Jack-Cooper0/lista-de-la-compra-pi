@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.insbaixcamp"
+        applicationId = "org.insbaixcamp.listacompra"
         minSdk = 24
         targetSdk = 37
         versionCode = 1

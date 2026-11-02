@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shopping List</string>
+    <string name="default_web_client_id">421796813961-t35phbajlve099uedg0tfm633t54o651.apps.googleusercontent.com</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Header & List Selector -->
+    <string name="title_app">🛒 My Shopping</string>
+    <string name="subtitle_app">Organize and share</string>
+    <string name="btn_select_list">Choose list</string>
+    <string name="header_my_lists">📍 MY LISTS</string>
+    <string name="header_shared_lists">👥 SHARED LISTS</string>
+    <string name="btn_create_new_list">+ Create new list</string>
+    <string name="btn_add_product">Add Product</string>
+
+    <!-- List Details -->
+    <string name="status_personal">👤 Personal</string>
+    <string name="status_shared">👥 Shared (%1$d)</string>
+    <string name="progress_completed">%1$d of %2$d completed</string>
+
+    <!-- Categories & Products -->
+    <string name="title_categories">Categories</string>
+    <string name="btn_add_category">+ Add category</string>
+    <string name="chip_all">All</string>
+    <string name="title_products">Products</string>
+    <string name="empty_category">This category is empty</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">Start by creating a list</string>
+    <string name="empty_state_desc">Organize your weekly shopping and share with anyone you want.</string>
+
+    <!-- Dialogs & Buttons -->
+    <string name="dialog_create_list_title">Create New List</string>
+    <string name="dialog_edit_list_title">Edit List</string>
+    <string name="label_list_name">List name</string>
+    <string name="dialog_share_title">Share List</string>
+    <string name="label_user_email">User email</string>
+    <string name="btn_share">Share</string>
+    <string name="toast_shared_with">List shared with %1$s</string>
+    <string name="dialog_new_category_title">New Category</string>
+    <string name="label_category_name">Category name</string>
+    <string name="dialog_manage_category_title">Manage Category</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_accept">Accept</string>
+    <string name="btn_add">Add</string>
+    <string name="dialog_add_product_title">Add Product</string>
+    <string name="dialog_edit_product_title">Edit Product</string>
+    <string name="label_product_name_req">Product name (required)</string>
+    <string name="error_product_name_req">Product name is required</string>
+    <string name="label_product_qty_opt">Quantity / Note (optional, e.g. 1 kg, 2L)</string>
+    <string name="label_category">Category:</string>
+    <string name="error_empty_field">This field cannot be empty</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_welcome">Welcome</string>
+    <string name="profile_signin_google_desc">Sign in with Google to sync your lists in the cloud.</string>
+    <string name="profile_signin_google_btn">Sign in with Google</string>
+    <string name="profile_signout_btn">Sign Out</string>
+    <string name="profile_user_default">User</string>
+    <string name="profile_language_title">Language</string>
+    <string name="signin_success">Successfully signed in</string>
+</resources>

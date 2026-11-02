@@ -44,13 +44,7 @@ class ListasRepository(context: Context) {
 
         // 1. Carregar dades locals guardades prèviament en SharedPreferences
         val listasLocales = cargarDeLocal()
-        if (listasLocales.isNotEmpty()) {
-            _listas.value = listasLocales
-        } else {
-            val muestras = obtenerListasMuestra()
-            _listas.value = muestras
-            guardarEnLocal(muestras)
-        }
+        _listas.value = listasLocales
 
         // 2. Escuchar cambios en la autenticación de Firebase
         FirebaseAuth.getInstance().addAuthStateListener { auth ->
@@ -457,44 +451,5 @@ class ListasRepository(context: Context) {
         val productosActualizados = lista.productos.filterNot { it.id == productoId }
         val listaActualizada = lista.copy(productos = productosActualizados)
         actualizarLista(listaActualizada)
-    }
-
-    // --- DADES DE MOSTRA INICIALS ---
-
-    private fun obtenerListasMuestra(): List<ListaCompra> {
-        val catLlactics = Categoria(id = "cat_1", nombre = "Llàctics i Ou")
-        val catFruita = Categoria(id = "cat_2", nombre = "Fruites i Verdures")
-        val catBegudes = Categoria(id = "cat_3", nombre = "Begudes")
-
-        val prod1 = Producto(id = "p1", nombre = "Llet de civada", completado = false, categoriaId = catLlactics.id, cantidad = "2L")
-        val prod2 = Producto(id = "p2", nombre = "Formatge fresc", completado = true, categoriaId = catLlactics.id, cantidad = "200g")
-        val prod3 = Producto(id = "p3", nombre = "Pomes vermelles", completado = false, categoriaId = catFruita.id, cantidad = "1 kg")
-        val prod4 = Producto(id = "p4", nombre = "Aigua mineral", completado = false, categoriaId = catBegudes.id, cantidad = "1 pack")
-
-        val listaPersonal = ListaCompra(
-            id = "lista_1",
-            nombre = "Compra setmanal casa",
-            propietarioEmail = "alumne@insbaixcamp.cat",
-            esCompartida = false,
-            usuariosConAcceso = listOf("alumne@insbaixcamp.cat"),
-            categorias = listOf(catLlactics, catFruita, catBegudes),
-            productos = listOf(prod1, prod2, prod3, prod4)
-        )
-
-        val catFesta = Categoria(id = "cat_4", nombre = "Aperitius")
-        val prodFesta1 = Producto(id = "p5", nombre = "Patates fregides", completado = false, categoriaId = catFesta.id, cantidad = "2 bosses")
-        val prodFesta2 = Producto(id = "p6", nombre = "Refrescos", completado = true, categoriaId = catBegudes.id, cantidad = "6 llaunes")
-
-        val listaCompartida = ListaCompra(
-            id = "lista_2",
-            nombre = "Festa del Projecte (Compartida)",
-            propietarioEmail = "profe@insbaixcamp.cat",
-            esCompartida = true,
-            usuariosConAcceso = listOf("profe@insbaixcamp.cat", "alumne@insbaixcamp.cat"),
-            categorias = listOf(catFesta, catBegudes),
-            productos = listOf(prodFesta1, prodFesta2)
-        )
-
-        return listOf(listaPersonal, listaCompartida)
     }
 }

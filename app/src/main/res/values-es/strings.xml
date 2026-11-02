@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lista de la Compra</string>
+    <string name="default_web_client_id">421796813961-t35phbajlve099uedg0tfm633t54o651.apps.googleusercontent.com</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_profile">Perfil</string>
+
+    <!-- Header & List Selector -->
+    <string name="title_app">🛒 Mi Compra</string>
+    <string name="subtitle_app">Organiza y comparte</string>
+    <string name="btn_select_list">Elegir lista</string>
+    <string name="header_my_lists">📍 MIS LISTAS</string>
+    <string name="header_shared_lists">👥 COMPARTIDAS</string>
+    <string name="btn_create_new_list">+ Crear nueva lista</string>
+    <string name="btn_add_product">Añadir Producto</string>
+
+    <!-- List Details -->
+    <string name="status_personal">👤 Personal</string>
+    <string name="status_shared">👥 Compartida (%1$d)</string>
+    <string name="progress_completed">%1$d de %2$d completados</string>
+
+    <!-- Categories & Products -->
+    <string name="title_categories">Categorías</string>
+    <string name="btn_add_category">+ Añadir categoría</string>
+    <string name="chip_all">Todas</string>
+    <string name="title_products">Productos</string>
+    <string name="empty_category">Esta categoría está vacía</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">Empieza creando una lista</string>
+    <string name="empty_state_desc">Organiza tus compras semanales y compártelas con quien quieras.</string>
+
+    <!-- Dialogs & Buttons -->
+    <string name="dialog_create_list_title">Crear Nueva Lista</string>
+    <string name="dialog_edit_list_title">Editar Lista</string>
+    <string name="label_list_name">Nombre de la lista</string>
+    <string name="dialog_share_title">Compartir Lista</string>
+    <string name="label_user_email">Email del usuario</string>
+    <string name="btn_share">Compartir</string>
+    <string name="toast_shared_with">Lista compartida con %1$s</string>
+    <string name="dialog_new_category_title">Nueva Categoría</string>
+    <string name="label_category_name">Nombre de la categoría</string>
+    <string name="dialog_manage_category_title">Gestionar Categoría</string>
+    <string name="btn_delete">Eliminar</string>
+    <string name="btn_save">Guardar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_accept">Aceptar</string>
+    <string name="btn_add">Añadir</string>
+    <string name="dialog_add_product_title">Añadir Producto</string>
+    <string name="dialog_edit_product_title">Editar Producto</string>
+    <string name="label_product_name_req">Nombre del producto (obligatorio)</string>
+    <string name="error_product_name_req">El nombre del producto es obligatorio</string>
+    <string name="label_product_qty_opt">Cantidad / Nota (opcional, ej: 1 kg, 2L)</string>
+    <string name="label_category">Categoría:</string>
+    <string name="error_empty_field">Este campo no puede estar vacío</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_welcome">Bienvenido</string>
+    <string name="profile_signin_google_desc">Inicia sesión con Google para sincronizar tus listas en la nube.</string>
+    <string name="profile_signin_google_btn">Iniciar sesión con Google</string>
+    <string name="profile_signout_btn">Cerrar Sesión</string>
+    <string name="profile_user_default">Usuario</string>
+    <string name="profile_language_title">Idioma</string>
+    <string name="signin_success">Sesión iniciada correctamente</string>
+</resources>

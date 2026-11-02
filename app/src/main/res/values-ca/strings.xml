@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lista de la Compra</string>
+    <string name="default_web_client_id">421796813961-t35phbajlve099uedg0tfm633t54o651.apps.googleusercontent.com</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inici</string>
+    <string name="nav_profile">Perfil</string>
+
+    <!-- Header & List Selector -->
+    <string name="title_app">🛒 La Meva Compra</string>
+    <string name="subtitle_app">Organitza i comparteix</string>
+    <string name="btn_select_list">Triar llista</string>
+    <string name="header_my_lists">📍 LES MEVES LLISTES</string>
+    <string name="header_shared_lists">👥 COMPARTIDES</string>
+    <string name="btn_create_new_list">+ Crear nova llista</string>
+    <string name="btn_add_product">Afegir Producte</string>
+
+    <!-- List Details -->
+    <string name="status_personal">👤 Personal</string>
+    <string name="status_shared">👥 Compartida (%1$d)</string>
+    <string name="progress_completed">%1$d de %2$d completats</string>
+
+    <!-- Categories & Products -->
+    <string name="title_categories">Categories</string>
+    <string name="btn_add_category">+ Afegir categoria</string>
+    <string name="chip_all">Totes</string>
+    <string name="title_products">Productes</string>
+    <string name="empty_category">Aquesta categoria està buida</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">Comença creant una llista</string>
+    <string name="empty_state_desc">Organitza les teves compres setmanals i comparteix-les amb qui vulguis.</string>
+
+    <!-- Dialogs & Buttons -->
+    <string name="dialog_create_list_title">Crear Nova Llista</string>
+    <string name="dialog_edit_list_title">Editar Llista</string>
+    <string name="label_list_name">Nom de la llista</string>
+    <string name="dialog_share_title">Compartir Llista</string>
+    <string name="label_user_email">Email de l\'usuari</string>
+    <string name="btn_share">Compartir</string>
+    <string name="toast_shared_with">Llista compartida amb %1$s</string>
+    <string name="dialog_new_category_title">Nova Categoria</string>
+    <string name="label_category_name">Nom de la categoria</string>
+    <string name="dialog_manage_category_title">Gestionar Categoria</string>
+    <string name="btn_delete">Eliminar</string>
+    <string name="btn_save">Desar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_accept">Acceptar</string>
+    <string name="btn_add">Afegir</string>
+    <string name="dialog_add_product_title">Afegir Producte</string>
+    <string name="dialog_edit_product_title">Editar Producte</string>
+    <string name="label_product_name_req">Nom del producte (obligatori)</string>
+    <string name="error_product_name_req">El nom del producte és obligatori</string>
+    <string name="label_product_qty_opt">Quantitat / Nota (opcional, ej: 1 kg, 2L)</string>
+    <string name="label_category">Categoria:</string>
+    <string name="error_empty_field">Aquest camp no pot estar buit</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_welcome">Benvingut</string>
+    <string name="profile_signin_google_desc">Inicia sessió amb Google per sincronitzar les teves llistes a la núvol.</string>
+    <string name="profile_signin_google_btn">Iniciar sessió amb Google</string>
+    <string name="profile_signout_btn">Tancar Sessió</string>
+    <string name="profile_user_default">Usuari</string>
+    <string name="profile_language_title">Idioma</string>
+    <string name="signin_success">Sessió iniciada correctament</string>
+</resources>

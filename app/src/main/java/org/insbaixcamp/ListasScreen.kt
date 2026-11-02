@@ -19,6 +19,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import org.insbaixcamp.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -61,8 +63,8 @@ fun ListasScreen(
             if (listaActual != null) {
                 ExtendedFloatingActionButton(
                     onClick = { mostrarDialogoNuevoProducto = true },
-                    icon = { Text("+", fontSize = 22.sp, fontWeight = FontWeight.Bold) },
-                    text = { Text("Afegir Producte", fontWeight = FontWeight.Bold) },
+                    icon = { Text("+", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+                    text = { Text(stringResource(R.string.btn_add_product), fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, softWrap = false) },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = RoundedCornerShape(20.dp),
@@ -85,13 +87,13 @@ fun ListasScreen(
             ) {
                 Column {
                     Text(
-                        text = "🛒 La Meva Compra",
+                        text = stringResource(R.string.title_app),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "Organitza i comparteix",
+                        text = stringResource(R.string.subtitle_app),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -103,14 +105,17 @@ fun ListasScreen(
                     FilledTonalButton(
                         onClick = { dropdownExpandido = true },
                         shape = RoundedCornerShape(16.dp),
-                        contentPadding = PaddingValues(horizontal = 20.dp, vertical =10.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = listaActual?.nombre?.take(15) ?: "Triar llista",
+                            text = listaActual?.nombre?.take(15) ?: stringResource(R.string.btn_select_list),
                             fontWeight = FontWeight.SemiBold,
-                            fontSize = 13.sp
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text("▼", fontSize = 10.sp)
                     }
 
@@ -129,7 +134,7 @@ fun ListasScreen(
 
                         if (misListas.isNotEmpty()) {
                             DropdownMenuItem(
-                                text = { Text("📍 LES MEVES LLISTES", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = MaterialTheme.colorScheme.primary) },
+                                text = { Text(stringResource(R.string.header_my_lists), fontWeight = FontWeight.Bold, fontSize = 11.sp, color = MaterialTheme.colorScheme.primary) },
                                 onClick = {},
                                 enabled = false
                             )
@@ -147,7 +152,7 @@ fun ListasScreen(
                         if (listasCompartidas.isNotEmpty()) {
                             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                             DropdownMenuItem(
-                                text = { Text("👥 COMPARTIDES", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = MaterialTheme.colorScheme.secondary) },
+                                text = { Text(stringResource(R.string.header_shared_lists), fontWeight = FontWeight.Bold, fontSize = 11.sp, color = MaterialTheme.colorScheme.secondary) },
                                 onClick = {},
                                 enabled = false
                             )
@@ -165,7 +170,7 @@ fun ListasScreen(
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                         DropdownMenuItem(
-                            text = { Text("+ Crear nova llista", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) },
+                            text = { Text(stringResource(R.string.btn_create_new_list), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) },
                             onClick = {
                                 dropdownExpandido = false
                                 mostrarDialogoNuevaLista = true
@@ -250,12 +255,12 @@ fun ListasScreen(
                         ) {
                             val esPropietari = listaActual.propietarioEmail == emailUsuario || listaActual.propietarioEmail.isBlank()
                             Text(
-                                text = if (listaActual.esCompartida) "👥 Compartida (${listaActual.usuariosConAcceso.size})" else if (esPropietari) "👤 Personal" else "👥 ${listaActual.propietarioEmail}",
+                                text = if (listaActual.esCompartida) stringResource(R.string.status_shared, listaActual.usuariosConAcceso.size) else if (esPropietari) stringResource(R.string.status_personal) else "👥 ${listaActual.propietarioEmail}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "$completadosProds de $totalProds completats",
+                                text = stringResource(R.string.progress_completed, completadosProds, totalProds),
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
@@ -273,12 +278,12 @@ fun ListasScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Categories",
+                        text = stringResource(R.string.title_categories),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     TextButton(onClick = { mostrarDialogoNuevaCategoria = true }, contentPadding = PaddingValues(4.dp)) {
-                        Text("+ Afegir categoria", fontSize = 12.sp)
+                        Text(stringResource(R.string.btn_add_category), fontSize = 12.sp)
                     }
                 }
 
@@ -290,7 +295,7 @@ fun ListasScreen(
                         FilterChip(
                             selected = categoriaFiltroId == "",
                             onClick = { categoriaFiltroId = "" },
-                            label = { Text("Totes") },
+                            label = { Text(stringResource(R.string.chip_all)) },
                             shape = RoundedCornerShape(12.dp)
                         )
                     }
@@ -318,7 +323,7 @@ fun ListasScreen(
 
                 // --- PRODUCTS LIST ---
                 Text(
-                    text = "Productes",
+                    text = stringResource(R.string.title_products),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -342,7 +347,7 @@ fun ListasScreen(
                             Text("✨", fontSize = 36.sp)
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Aquesta categoria està buida",
+                                text = stringResource(R.string.empty_category),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -393,13 +398,13 @@ fun ListasScreen(
                             Text("🛒", fontSize = 56.sp)
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Comença creant una llista",
+                                text = stringResource(R.string.empty_state_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                text = "Organitza les teves compres setmanals i comparteix-les amb qui vulguis.",
+                                text = stringResource(R.string.empty_state_desc),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center
@@ -409,7 +414,7 @@ fun ListasScreen(
                                 onClick = { mostrarDialogoNuevaLista = true },
                                 shape = RoundedCornerShape(16.dp)
                             ) {
-                                Text("+ Crear nova llista")
+                                Text(stringResource(R.string.btn_create_new_list))
                             }
                         }
                     }
@@ -422,9 +427,9 @@ fun ListasScreen(
 
     if (mostrarDialogoNuevaLista) {
         DialogoTextoInput(
-            titulo = "Crear Nova Llista",
-            etiqueta = "Nom de la llista",
-            textoBoton = "Crear",
+            titulo = stringResource(R.string.dialog_create_list_title),
+            etiqueta = stringResource(R.string.label_list_name),
+            textoBoton = stringResource(R.string.btn_accept),
             onDismiss = { mostrarDialogoNuevaLista = false },
             onConfirmar = { nom ->
                 viewModel.crearNuevaLista(nom)
@@ -435,10 +440,10 @@ fun ListasScreen(
 
     if (mostrarDialogoEditarLista && listaActual != null) {
         DialogoTextoInput(
-            titulo = "Editar Nom",
-            etiqueta = "Nou nom",
+            titulo = stringResource(R.string.dialog_edit_list_title),
+            etiqueta = stringResource(R.string.label_list_name),
             textoInicial = listaActual.nombre,
-            textoBoton = "Desar",
+            textoBoton = stringResource(R.string.btn_save),
             onDismiss = { mostrarDialogoEditarLista = false },
             onConfirmar = { nouNom ->
                 viewModel.editarNombreLista(listaActual.id, nouNom)
@@ -450,13 +455,14 @@ fun ListasScreen(
     if (mostrarDialogoCompartir && listaActual != null) {
         val context = LocalContext.current
         DialogoTextoInput(
-            titulo = "Compartir Llista",
-            etiqueta = "Email de l'usuari",
-            textoBoton = "Compartir",
+            titulo = stringResource(R.string.dialog_share_title),
+            etiqueta = stringResource(R.string.label_user_email),
+            textoBoton = stringResource(R.string.btn_share),
             onDismiss = { mostrarDialogoCompartir = false },
             onConfirmar = { email ->
                 viewModel.compartirLista(listaActual.id, email)
-                Toast.makeText(context, "Llista compartida amb $email", Toast.LENGTH_SHORT).show()
+                val msg = context.resources.getString(R.string.toast_shared_with, email)
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                 mostrarDialogoCompartir = false
             }
         )
@@ -464,9 +470,9 @@ fun ListasScreen(
 
     if (mostrarDialogoNuevaCategoria && listaActual != null) {
         DialogoTextoInput(
-            titulo = "Nova Categoria",
-            etiqueta = "Nom de la categoria",
-            textoBoton = "Afegir",
+            titulo = stringResource(R.string.dialog_new_category_title),
+            etiqueta = stringResource(R.string.label_category_name),
+            textoBoton = stringResource(R.string.btn_add),
             onDismiss = { mostrarDialogoNuevaCategoria = false },
             onConfirmar = { nomCat ->
                 viewModel.crearCategoria(listaActual.id, nomCat)
@@ -493,7 +499,7 @@ fun ListasScreen(
 
     if (mostrarDialogoNuevoProducto && listaActual != null) {
         DialogoFormularioProducto(
-            titulo = "Nou Producte",
+            titulo = stringResource(R.string.dialog_add_product_title),
             categorias = listaActual.categorias,
             categoriaDefectoId = if (categoriaFiltroId.isNotBlank()) categoriaFiltroId else listaActual.categorias.firstOrNull()?.id ?: "",
             onDismiss = { mostrarDialogoNuevoProducto = false },
@@ -507,7 +513,7 @@ fun ListasScreen(
     if (productoAEditar != null && listaActual != null) {
         val prod = productoAEditar!!
         DialogoFormularioProducto(
-            titulo = "Editar Producte",
+            titulo = stringResource(R.string.dialog_edit_product_title),
             nombreInicial = prod.nombre,
             cantidadInicial = prod.cantidad,
             categoriaDefectoId = prod.categoriaId,
@@ -622,7 +628,7 @@ fun DialogoTextoInput(
     titulo: String,
     etiqueta: String,
     textoInicial: String = "",
-    textoBoton: String = "Acceptar",
+    textoBoton: String = stringResource(R.string.btn_accept),
     onDismiss: () -> Unit,
     onConfirmar: (String) -> Unit
 ) {
@@ -649,7 +655,7 @@ fun DialogoTextoInput(
                 )
                 if (error) {
                     Text(
-                        text = "Aquest camp no pot estar buit",
+                        text = stringResource(R.string.error_empty_field),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 4.dp)
@@ -673,7 +679,7 @@ fun DialogoTextoInput(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.btn_cancel))
             }
         }
     )
@@ -691,12 +697,12 @@ fun DialogoEditarEliminarCategoria(
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(28.dp),
-        title = { Text("Gestionar Categoria", fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.dialog_manage_category_title), fontWeight = FontWeight.Bold) },
         text = {
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
-                label = { Text("Nom de la categoria") },
+                label = { Text(stringResource(R.string.label_category_name)) },
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -708,7 +714,7 @@ fun DialogoEditarEliminarCategoria(
                     onClick = onEliminar,
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Eliminar")
+                    Text(stringResource(R.string.btn_delete))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
@@ -717,13 +723,13 @@ fun DialogoEditarEliminarCategoria(
                     },
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Desar")
+                    Text(stringResource(R.string.btn_save))
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.btn_cancel))
             }
         }
     )
@@ -759,7 +765,7 @@ fun DialogoFormularioProducto(
                         nombre = it
                         if (it.isNotBlank()) errorNombre = false
                     },
-                    label = { Text("Nom del producte (obligatori)") },
+                    label = { Text(stringResource(R.string.label_product_name_req)) },
                     isError = errorNombre,
                     singleLine = true,
                     shape = RoundedCornerShape(14.dp),
@@ -767,7 +773,7 @@ fun DialogoFormularioProducto(
                 )
                 if (errorNombre) {
                     Text(
-                        text = "El nom del producte és obligatori",
+                        text = stringResource(R.string.error_product_name_req),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Start
@@ -777,13 +783,13 @@ fun DialogoFormularioProducto(
                 OutlinedTextField(
                     value = cantidad,
                     onValueChange = { cantidad = it },
-                    label = { Text("Quantitat / Nota (opcional, ej: 1 kg, 2L)") },
+                    label = { Text(stringResource(R.string.label_product_qty_opt)) },
                     singleLine = true,
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Text("Categoria:", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.label_category), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
 
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(categorias) { cat ->
@@ -808,12 +814,12 @@ fun DialogoFormularioProducto(
                 },
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Desar")
+                Text(stringResource(R.string.btn_save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.btn_cancel))
             }
         }
     )

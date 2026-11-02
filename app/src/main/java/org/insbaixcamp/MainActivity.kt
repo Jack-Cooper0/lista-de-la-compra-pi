@@ -5,8 +5,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,9 +24,13 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import org.insbaixcamp.utils.cambiarIdiomaCatalan
+import org.insbaixcamp.utils.cambiarIdiomaEspanol
+import org.insbaixcamp.utils.cambiarIdiomaIngles
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,12 +51,16 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.ClearCredentialStateRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
+import org.insbaixcamp.R
 import org.insbaixcamp.ui.theme.ListaDeLaCompraTheme
 
 class MainActivity : ComponentActivity() {
@@ -76,10 +87,10 @@ fun ListaDeLaCompraApp() {
                     icon = {
                         Icon(
                             painterResource(it.icon),
-                            contentDescription = it.label
+                            contentDescription = stringResource(it.labelRes)
                         )
                     },
-                    label = { Text(it.label) },
+                    label = { Text(stringResource(it.labelRes)) },
                     selected = it == currentDestination,
                     onClick = { currentDestination = it }
                 )
@@ -94,7 +105,6 @@ fun ListaDeLaCompraApp() {
             ) {
                 when (currentDestination) {
                     AppDestinations.HOME -> ListasScreen()
-                    AppDestinations.FAVORITES -> Greeting("Favorites")
                     AppDestinations.PROFILE -> ProfileScreen()
                 }
             }
@@ -148,7 +158,7 @@ fun ProfileScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = user?.displayName ?: "Usuari",
+                        text = user?.displayName ?: stringResource(R.string.profile_user_default),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -167,11 +177,17 @@ fun ProfileScreen() {
                         onClick = {
                             FirebaseAuth.getInstance().signOut()
                             user = null
+                            scope.launch {
+                                try {
+                                    val credentialManager = CredentialManager.create(context)
+                                    credentialManager.clearCredentialState(ClearCredentialStateRequest())
+                                } catch (_: Exception) {}
+                            }
                         },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Tancar Sessió", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.profile_signout_btn), fontWeight = FontWeight.SemiBold)
                     }
                 } else {
                     Surface(
@@ -187,7 +203,7 @@ fun ProfileScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Benvingut",
+                        text = stringResource(R.string.profile_welcome),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -195,7 +211,7 @@ fun ProfileScreen() {
                     Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
-                        text = "Inicia sessió amb Google per sincronitzar les teves llistes a la núvol.",
+                        text = stringResource(R.string.profile_signin_google_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -207,12 +223,17 @@ fun ProfileScreen() {
                         onClick = {
                             val credentialManager = CredentialManager.create(context)
 
+                            val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(webClientId)
+                                .build()
+
                             val googleIdOption = GetGoogleIdOption.Builder()
                                 .setFilterByAuthorizedAccounts(false)
                                 .setServerClientId(webClientId)
+                                .setAutoSelectEnabled(false)
                                 .build()
 
                             val request = GetCredentialRequest.Builder()
+                                .addCredentialOption(signInWithGoogleOption)
                                 .addCredentialOption(googleIdOption)
                                 .build()
 
@@ -224,18 +245,28 @@ fun ProfileScreen() {
                                     )
 
                                     val credential = result.credential
-                                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                                    val firebaseCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+                                    val googleIdTokenCredential = try {
+                                        GoogleIdTokenCredential.createFrom(credential.data)
+                                    } catch (_: Exception) {
+                                        null
+                                    }
 
-                                    FirebaseAuth.getInstance().signInWithCredential(firebaseCredential)
-                                        .addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
-                                                user = FirebaseAuth.getInstance().currentUser
-                                                Toast.makeText(context, "Sessió iniciada correctament", Toast.LENGTH_SHORT).show()
-                                            } else {
-                                                Toast.makeText(context, "Error: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                    if (googleIdTokenCredential != null) {
+                                        val firebaseCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+
+                                        FirebaseAuth.getInstance().signInWithCredential(firebaseCredential)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    user = FirebaseAuth.getInstance().currentUser
+                                                    val successMsg = context.resources.getString(R.string.signin_success)
+                                                    Toast.makeText(context, successMsg, Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    Toast.makeText(context, "Error: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                                }
                                             }
-                                        }
+                                    } else {
+                                        Toast.makeText(context, "Error: No s'ha pogut obtenir la credencial de Google", Toast.LENGTH_SHORT).show()
+                                    }
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                     Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
@@ -245,7 +276,50 @@ fun ProfileScreen() {
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Iniciar sessió amb Google", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.profile_signin_google_btn), fontWeight = FontWeight.SemiBold)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = stringResource(R.string.profile_language_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = { cambiarIdiomaEspanol(context) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 6.dp)
+                    ) {
+                        Text("Español 🇪🇸", fontSize = 10.5.sp, maxLines = 1, softWrap = false)
+                    }
+
+                    OutlinedButton(
+                        onClick = { cambiarIdiomaIngles(context) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 6.dp)
+                    ) {
+                        Text("English 🇬🇧", fontSize = 10.5.sp, maxLines = 1, softWrap = false)
+                    }
+
+                    OutlinedButton(
+                        onClick = { cambiarIdiomaCatalan(context) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 6.dp)
+                    ) {
+                        Text("Català", fontSize = 10.5.sp, maxLines = 1, softWrap = false)
                     }
                 }
             }
@@ -254,12 +328,11 @@ fun ProfileScreen() {
 }
 
 enum class AppDestinations(
-    val label: String,
+    val labelRes: Int,
     val icon: Int,
 ) {
-    HOME("Home", R.drawable.ic_home),
-    FAVORITES("Favorites", R.drawable.ic_favorite),
-    PROFILE("Profile", R.drawable.ic_account_box),
+    HOME(R.string.nav_home, R.drawable.ic_home),
+    PROFILE(R.string.nav_profile, R.drawable.ic_account_box),
 }
 
 @Composable
