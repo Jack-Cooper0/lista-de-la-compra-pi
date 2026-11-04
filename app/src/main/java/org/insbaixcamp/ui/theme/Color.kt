@@ -2,7 +2,7 @@ package org.insbaixcamp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Modern Fresh Teal Palette
+
 val PrimaryLight = Color(0xFF006A60)
 val OnPrimaryLight = Color(0xFFFFFFFF)
 val PrimaryContainerLight = Color(0xFF74F8E5)

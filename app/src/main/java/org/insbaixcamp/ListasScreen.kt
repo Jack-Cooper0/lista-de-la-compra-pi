@@ -79,7 +79,7 @@ fun ListasScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            // --- HEADER & LIST SELECTOR ---
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -182,7 +182,6 @@ fun ListasScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // --- LIST DETAILS & ACTIONS CARD ---
             if (listaActual != null) {
                 val totalProds = listaActual.productos.size
                 val completadosProds = listaActual.productos.count { it.completado }
@@ -271,7 +270,7 @@ fun ListasScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- CATEGORIES BAR ---
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -321,7 +320,7 @@ fun ListasScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- PRODUCTS LIST ---
+
                 Text(
                     text = stringResource(R.string.title_products),
                     style = MaterialTheme.typography.titleSmall,
@@ -379,7 +378,7 @@ fun ListasScreen(
                     }
                 }
             } else {
-                // --- EMPTY STATE (NO LISTS) ---
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -423,7 +422,7 @@ fun ListasScreen(
         }
     }
 
-    // --- DIÀLEGS MODALS ---
+
 
     if (mostrarDialogoNuevaLista) {
         DialogoTextoInput(
@@ -621,7 +620,6 @@ fun ItemProducto(
     }
 }
 
-// --- DIÀLEGS MODALS ---
 
 @Composable
 fun DialogoTextoInput(
